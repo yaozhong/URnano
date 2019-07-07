@@ -5,12 +5,9 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-#
-# Created on Mon Mar 27 14:04:57 2017
-# from rnn import rnn_layers
 
 # 20190116
-# UNet for processing the same amout of data as chiron, revised by Yao-zhong@imsut
+# UNet for processing the same amount of data as chiron, revised by Yao-zhong@imsut
 # 20190220 re-crafted U-net training
 # 20160615 change to the 11 coding system
 
