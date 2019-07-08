@@ -1,21 +1,16 @@
+# Copyright 2019 
+#
+#This Source Code Form is subject to the terms of the Mozilla Public
+#License, v. 2.0. If a copy of the MPL was not distributed with this
+#file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Chiron Authors. All Rights Reserved.
-#
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-# 20190116
-# UNet for processing the same amount of data as chiron, revised by Yao-zhong@imsut
-# 20190220 re-crafted U-net training
-# 20160615 change to the 11 coding system
 
 from __future__ import absolute_import, division
 from __future__ import print_function
 import argparse, sys, os, time, json
-
-from distutils.dir_util import copy_tree
 
 import tensorflow as tf
 
@@ -29,10 +24,9 @@ from keras.layers import Lambda
 
 from models.model_unet import *
 from models.model_cnn import *
-from unet_hyperOpt import *
 
 from utility import *
-from data_input_new import *
+from data_input import *
 
 import h5py
 import numpy as np
