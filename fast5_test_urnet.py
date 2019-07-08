@@ -19,7 +19,7 @@ import h5py
 import numpy as np
 
 import argparse, os, sys, time
-from data_input_new import read_data_for_eval
+from data_input import read_data_for_eval
 
 from utility import *
 from models.model_unet import *

@@ -62,7 +62,7 @@ MODEL="../experiment/model/Unet.model.parameters.json"
 LOSS="ce_dice_loss"
 NORM_FILE_SAVE="../experiment/model/statistics/all_data_stats.pickle"
 
-python fast5_test_urnet.py -i $SIGNAL_FOLD -it signal -o $OUTPUT -mp $MODEL -loss $LOSS -nID 3 -norm $NORM_FILE_SAVE -tag en11.URnet
+python fast5_test_urnet.py -i $SIGNAL_FOLD -it signal -o $OUTPUT -mp $MODEL -loss $LOSS -nID 3 -norm $NORM_FILE_SAVE -tag URnet.all
 ```
 
 
