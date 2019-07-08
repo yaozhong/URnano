@@ -23,7 +23,6 @@ from keras.utils import to_categorical
 from keras.layers import Lambda
 
 from models.model_unet import *
-from models.model_cnn import *
 
 from utility import *
 from data_input import *
@@ -56,29 +55,7 @@ def get_pred_ed_list(X, Y, model, plotFigurePath=""):
         ## original
         ##ed =editDistance(pred, gold)
         ed =editDistance(pred[:-1], gold[:-1])
-        eds.append(ed/(len(gold)-1))   # correct the bug 20190624
-
-        # cacluate the perason correlation, equal length is required
-
-        # if len(pred_seg) > len(label_seg):
-        #     pr, _ = pearsonr(pred_seg[:-1], np.pad(label_seg[:-1], (0,len(pred_seg)-len(label_seg)),'constant'))
-        # else:
-        #     pr, _ = pearsonr(np.pad(pred_seg[:-1],(0, len(label_seg)-len(pred_seg)),'constant'), label_seg[:-1])
-
-        # ## perason score need to be rechecked        
-        # if(not np.isnan(pr)):
-        #     prs.append(pr)
-        # else:
-        #     print(X[i])
-        #     print(pred_seg)
-        #     print(label_seg)
-
-        ############################ IOU calucation for segments ########################
-        ## processing the non-even issues
-        # pred_split = [0] + np.cumsum(pred_seg[:-1])
-        # gold_split = [0] + np.cumsum(gold_seg[:-1])
-
-
+        eds.append(ed/(len(gold)-1))  
 
         # cacluate the dice score with labels.
         if plotFigurePath != "":
@@ -99,7 +76,7 @@ def get_pred_ed_list(X, Y, model, plotFigurePath=""):
 
 
 #######################################################################
-def test_unet(args, modelSavePath="../experiment/model/",norm=False):
+def test_urnet(args, modelSavePath="./experiment/model/",norm=False):
 
     if(args.plot_figure !="" and not os.path.exists(args.plot_figure)):
         os.mkdir(args.plot_figure)
@@ -180,12 +157,12 @@ def test_unet(args, modelSavePath="../experiment/model/",norm=False):
     eds.extend(eds_tmp)
     prs.extend(prs_tmp)
 
-    print("** Averaged edit distance for the U-net model %d samples is: %f ±(%f)" %(len(eds), np.mean(eds), np.std(eds))) 
-    print("** Averaged Pearson for the U-net model %d samples is: %f ±(%f)" %(len(prs), np.mean(prs), np.std(prs))) 
+    print("** Averaged edit distance for the U-net model %d samples is: %f +/-(%f)" %(len(eds), np.mean(eds), np.std(eds)))
+    print("** Averaged Pearson for the U-net model %d samples is: %f +/-(%f)" %(len(prs), np.mean(prs), np.std(prs))) 
 
 
 ## functions to calcuate the confusion matrix
-def test_confustion_matrix(args, modelSavePath="../experiment/model/", norm=False):
+def test_confustion_matrix(args, modelSavePath="./experiment/model/", norm=False):
 
     lossType = args.loss
     fileConfig = (args.data_dir, args.test_cache)
@@ -261,7 +238,7 @@ def test_confustion_matrix(args, modelSavePath="../experiment/model/", norm=Fals
         print("----------------------")
  
     print("@ Visualziation confusion matrix ...")
-    plot_confusion_matrix(label_vec_new.flatten(), pred_results.flatten(),range(8), "UNet_" + ("LSTM-"+str(args.lstm)  if args.lstm else "") + "_" + lossType)
+    plot_confusion_matrix(label_vec_new.flatten(), pred_results.flatten(),range(8), "UNet_" + ("LSTM-"+str(args.networkID)  if args.networkID else "") + "_" + lossType)
     
 
 if __name__ == "__main__":
@@ -304,7 +281,8 @@ if __name__ == "__main__":
     parser.add_argument('-mp', '--model_param', default="", required=True, help="loss function used to learn the segmentation model.")
     parser.add_argument('-pf', '--plot_figure', default="", type=str, help="plot figure and show verbose")
     parser.add_argument('-tm', '--test_mode', default="cfm", required=True, help="test model selection cfm/plt")
-    parser.add_argument('-lstm', '--lstm', default=0,type=int,  help="loss function used to learn the segmentation model.")
+    parser.add_argument('-nID', '--networkID', default=3, type=int, help="Selection of different network architectures.{0:UNet_only, 1:GRU3_solo, 2:UNet_GRU3, 3:UR-net}")
+    
 
     parser.add_argument('-norm', '--norm', default="",type=str,  help="Training data statistics of saved file for global normalziation ... ")
     parser.add_argument('-tag', '--tag', default="",type=str,  help="Model tag information.")
@@ -328,7 +306,7 @@ if __name__ == "__main__":
         test_confustion_matrix(args)
     
     if(args.test_mode == "plt"):
-        test_unet(args)
+        test_urnet(args)
     
 
 

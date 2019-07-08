@@ -30,7 +30,7 @@ from unet_hyperOpt import *
 
 CB = [callbacks.EarlyStopping(monitor="val_loss", patience=10, mode="auto", restore_best_weights=True)]
 
-def train(args, modelSavePath="../experiment/model/", curveMonitor=True):
+def train(args, modelSavePath="./experiment/model/", curveMonitor=True):
 
     lossType = args.loss
 
@@ -97,29 +97,27 @@ def train(args, modelSavePath="../experiment/model/", curveMonitor=True):
 
     signals = Input(name='input', shape=[trainX.shape[1], 1], dtype=np.float32)
 
-    if args.lstm == 0:
-        print("** START module of UNet")
+    if args.networkID == 0:
+        print("** START training of UNet")
         model = UNet_only(signals, params["kernel_size"], params["conv_window_len"],  params["maxpooling_len"],  \
             params["stride"], True, params["DropoutRate"])  
 
-    elif args.lstm == 3:
-        print("** START module of UNet-GRU3")
+    elif args.networkID == 1:
+        print("** START training of conv1-GRU3-solo ...")
+        model = GRU3_solo(signals, params["kernel_size"], params["conv_window_len"],  params["maxpooling_len"],  \
+            params["stride"], True, params["DropoutRate"])
+
+    elif args.networkID == 2:
+        print("** START training of UNet-GRU3")
         model = UNet_GRU3(signals, params["kernel_size"], params["conv_window_len"],  params["maxpooling_len"],  \
             params["stride"], True, params["DropoutRate"])
         #plot_model(model, to_file='../experiment/devLOG/figures/UNet_GRU3_model.png')
 
-    elif args.lstm == 10:
-        print("** START conv1-GRU3-solo ...")
-        model = GRU3_solo(signals, params["kernel_size"], params["conv_window_len"],  params["maxpooling_len"],  \
-            params["stride"], True, params["DropoutRate"])
-
-
-    elif args.lstm == 12:
-        print("** START UR-net ...")
-        model = UNet_LSTM_MIX(signals, params["kernel_size"], params["conv_window_len"],  params["maxpooling_len"],  \
+    elif args.networkID == 3:
+        print("** START training of UR-net ...")
+        model = URNet(signals, params["kernel_size"], params["conv_window_len"],  params["maxpooling_len"],  \
             params["stride"], True, params["DropoutRate"])
         #plot_model(model, to_file='../experiment/devLOG/figures/MIX_UNet_RNN_model.png')
-
 
     # different loss function, loading ...
     if lossType == "dice_loss":       
@@ -161,7 +159,7 @@ def train(args, modelSavePath="../experiment/model/", curveMonitor=True):
     if curveMonitor == True and vsplit > 0:
 
         fig=plt.figure()
-        figureSavePath="../experiment/devLOG/train_curve/"+ timeTag.strftime("%Y%m%d")  + "-" + model_name + ".png"
+        figureSavePath="./experiment/devLOG/train_curve/"+ timeTag.strftime("%Y%m%d")  + "-" + model_name + ".png"
         plt.plot(history.history["loss"])
         plt.plot(history.history["val_loss"])
         plt.title("Training curve of the whole training set " + lossType)
@@ -220,9 +218,6 @@ if __name__ == "__main__":
     parser.add_argument('-n', '--segments_num', type = int, default = 20000,
                         help='Maximum number of segments read into the training queue, default(None) read all segments.')
 
-    #parser.add_argument('--configure', default = None,
-    #                    help="Model structure configure json file.")
-
     parser.add_argument('-k', '--k_mer', default=1, help='Output k-mer size')
 
     parser.add_argument('--retrain', dest='retrain', action='store_true',
@@ -234,7 +229,7 @@ if __name__ == "__main__":
     parser.add_argument('-l', '--loss', default="", required=True, help="loss function used to learn the segmentation model.")
     parser.add_argument('-cf', '--cacheFile', default="", required=True, help="Assigned cache files.")
     parser.add_argument('-mp', '--model_param', default="", required=True, help="loss function used to learn the segmentation model.")
-    parser.add_argument('-lstm', '--lstm', default=0, type=int, help="loss function used to learn the segmentation model.")
+    parser.add_argument('-nID', '--networkID', default=3, type=int, help="Selection of different network architectures.{0:UNet_only, 1:GRU3_solo, 2:UNet_GRU3, 3:UR-net}")
     parser.add_argument('-fSignal', '--fSignal', default=0, type=int,  help="Extrem signals of data to determine whethe kept.")
     parser.add_argument('-norm', '--norm', default="",type=str,  help="Training data statistics of saved file")
     parser.add_argument('-tag', '--tag', default="",type=str,  help="Model tag information.")
