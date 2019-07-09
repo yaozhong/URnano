@@ -1,7 +1,7 @@
 # URnano: Nanopore base-calling from a perspective of instance segmentation
 
-URnano is a nanopore base-caller that 
-More details can be found in <bioAxiv link>
+URnano is a nanopore base-caller that performing base-calling as a multi-label segmenation task.
+More details can be found in [BioAxiv](https://www.biorxiv.org/content/10.1101/694919v1).
 
 ## Docker enviroment
 We provide a docker image for running this code
@@ -19,7 +19,6 @@ nvidia-docker run -it --rm yaozhong/keras_r_tf:1.8 bash
 
 ## Data
 We use curated data provided by Chiron, which can be downloaded from http://dx.doi.org/10.5524/100425.
-We also provide data caching files can be directly used. 
 
 ## Training
 ```
@@ -67,5 +66,5 @@ python fast5_test_urnet.py -i $SIGNAL_FOLD -it signal -o $OUTPUT -mp $MODEL -los
 
 
 ## Acknowledgement
-We thank Chiron authors for providing source code (https://github.com/haotianteng/Chiron) and dataset.
+We thank Chiron authors for providing [source code](https://github.com/haotianteng/Chiron) and [dataset](http://gigadb.org/dataset/100425).
 The signal reading part and merging of base-calling results for a whole read part are revised based on Chiron (V0.3)'s code following MPL 2.0.
