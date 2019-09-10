@@ -115,15 +115,13 @@ def extract_fast5(args):
                     with open(os.path.join(ref_folder, os.path.splitext(file_n)[0] + '_ref.fastq'), 'w+') as ref_file:
                         ref_file.write(reference)
 
-
+## this function is used when generating simple_assembly and soft_merging assembly simultaneously
 def write_output2(args, segments, consensus,arda_consensus, time_list, file_pre, concise=False, suffix='fastq', seg_q_score=None,
                  q_score=None):
     """
     seg_q_score: A length seg_num string list. Quality score for the segments.
     q_socre: A string. Quality score for the consensus sequence.
     """
-    print("Arda consensus")
-    print(len(arda_consensus))
     start_time, reading_time, basecall_time, assembly_time = time_list
     result_folder = os.path.join(args.output, 'result')
     seg_folder = os.path.join(args.output, 'segments')
@@ -143,9 +141,7 @@ def write_output2(args, segments, consensus,arda_consensus, time_list, file_pre,
                     out_f.write(seg_q_score[indx] + '\n')
         q_score = "".join(["+" for i in range(len(consensus))])
         if (suffix == 'fastq') and (q_score is not None):
-            arda_qscore = "".join(["+" for i in range(len(arda_consensus))])
-            #print("arda consensus")
-            #print(consensus)
+            arda_qscore = "".join(["!" for i in range(len(arda_consensus))])
             out_con.write('@{}\n{}\n+\n{}\n'.format(file_pre, consensus, q_score))
             out_con_arda.write('@{}\n{}\n+\n{}\n'.format(file_pre, arda_consensus, arda_qscore))
         else:
@@ -172,8 +168,6 @@ def write_output(args, segments, consensus, time_list, file_pre, concise=False, 
     seg_q_score: A length seg_num string list. Quality score for the segments.
     q_socre: A string. Quality score for the consensus sequence.
     """
-    #print("Length of consensus")
-    #print(len(consensus))
     start_time, reading_time, basecall_time, assembly_time = time_list
     result_folder = os.path.join(args.output, 'result')
     seg_folder = os.path.join(args.output, 'segments')
@@ -213,21 +207,28 @@ def write_output(args, segments, consensus, time_list, file_pre, concise=False, 
                 "%d %d %d %d %d\n" % (total_len, args.batch_size, args.segment_len, args.jump, args.start))
             out_meta.write("# input_name model_name\n")
             out_meta.write("%s %s\n" % (args.input, args.model))
+
+## soft_merging algorithm
 def concatenate_reads(raw_reads,jump=290):
     final_raw_reads= np.zeros((300+jump*(len(raw_reads)-1),len(raw_reads[0][0])))
     final_raw_reads[:jump] = raw_reads[0][:jump]
     for i in range(1,len(raw_reads)):
         final_raw_reads[i*jump:i*jump+len(raw_reads[0])]+= raw_reads[i]
-    #print("final length of the whole read before compression: %d"%len(final_raw_reads))
     logits = np.argmax(final_raw_reads,-1)
     pred_2d, pred_seg = seqCompact(logits)
     pred = getOrigin_from_label2Dseq_11(pred_2d)
     pred = validPredLabel(pred)
     #print("Final length of prediction after compression %d "%len(pred))
     return pred
+
+
+## basecaller for the new assembly method
+## collapsing is delayed until the next step
 def unet_basecaller2(model, X,jump = 30):
     preds = model.predict(X, verbose=0) 
     return preds
+
+
 def unet_basecaller(model, X):
 
     preds = model.predict(X, verbose=0)
@@ -248,7 +249,7 @@ def unet_basecaller(model, X):
             
 
 ##########################################################
-# basecalling for the signal files and assembly
+# Trying new stuff for the basecalling part
 ##########################################################
 def evaluation2(signal_input, args):
 
@@ -320,14 +321,7 @@ def evaluation2(signal_input, args):
             
             if args.norm != "":
                 X = (X - stat_dict["m"])/(stat_dict["s"])
-            #X= (X-0)/(1)
-            #print(X)
-            #print("Length : %d"%len(X))
-            #output,raw_preds = unet_basecaller(unet_model, X)
             raw_preds = unet_basecaller(unet_model,X)
-            print("Final output")
-            print(raw_preds)
-            return
             #reads += output
             #output2 = unet_basecaller2(unet_model,X,jump = args.jump)
             if len(raw_reads)==0:
@@ -335,21 +329,13 @@ def evaluation2(signal_input, args):
             else:
 
                 raw_reads=np.concatenate((raw_reads,np.array(raw_preds)))
-        #print("Number of consecutive segments for this file : %d "%len(raw_reads))
-        #print("Shape  of a single raw_read")
-        #print(raw_reads.shape)
-        #print(len(raw_reads[0]))
-        #print(len(raw_reads[0][0]))
-        #print("Length of the reads: %d " %len(reads))
         
         final_read = concatenate_reads(raw_reads,jump = args.jump)
-        #print("Final read with ardas method : ")
-        #print("Length: %d "%len(final_read))
-        #print(final_read)
-        # assembly the read results
         print("Segment reads base calling finished, begin to assembly. %5.2f seconds" % (time.time() - start_time))
         basecall_time = time.time() - start_time
+        
 
+        # old way of assembling
         # doing simple assembly methods
         #print("old way of reads ")
         #print(reads[0])
