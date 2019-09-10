@@ -35,6 +35,8 @@ from scipy.stats import pearsonr
 def get_pred_ed_list(X, Y, model, plotFigurePath=""):
 
     preds = model.predict(X, verbose=0)
+    print("Predictions: ")
+    print(preds[0])
     golds = Y
     eds, prs = [], []
 
@@ -158,7 +160,7 @@ def test_urnet(args, modelSavePath="./experiment/model/",norm=False):
     prs.extend(prs_tmp)
 
     print("** Averaged edit distance for the U-net model %d samples is: %f +/-(%f)" %(len(eds), np.mean(eds), np.std(eds)))
-    print("** Averaged Pearson for the U-net model %d samples is: %f +/-(%f)" %(len(prs), np.mean(prs), np.std(prs))) 
+    #print("** Averaged Pearson for the U-net model %d samples is: %f +/-(%f)" %(len(prs), np.mean(prs), np.std(prs))) 
 
 
 ## functions to calcuate the confusion matrix
@@ -228,7 +230,7 @@ def test_confustion_matrix(args, modelSavePath="./experiment/model/", norm=False
     dataX = X[epochs*pred_batch:]
     preds = model.predict(dataX, verbose=0)  
     pred_results.extend([p for p in preds])
-
+    print(pred_results[0])
     pred_results = np.argmax(np.array(pred_results), axis=-1)
     print("Shape is the ", pred_results.shape)
 

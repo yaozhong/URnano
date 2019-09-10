@@ -1,4 +1,4 @@
-# Copyright 2017 The Chiron Authors. All Rights Reserved.
+# Copyright 2018 The Chiron Authors. All Rights Reserved.
 #
 #This Source Code Form is subject to the terms of the Mozilla Public
 #License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -297,6 +297,45 @@ class DataSet(object):
                 None, None, None
 
 
+def read_data_for_eval2(file_path, 
+                       start_index=0,
+                       step=20, 
+                       seg_length=300, 
+                       sig_norm="median",
+                       reverse = False):
+    """
+    Input Args:
+        file_path: file path to a signal file.
+        start_index: the index of the signal start to read.
+        step: sliding step size.
+        seg_length: length of segments.
+        sig_norm: if the signal need to be normalized.
+        reverse: if the signal need to be reversed.
+    """
+    if not file_path.endswith('.signal'):
+        raise ValueError('A .signal file is required.')
+    else:
+        event = list()
+        event_len = list()
+        label = list()
+        label_len = list()
+        f_signal = read_signal2(file_path)
+        if reverse:
+            f_signal = f_signal[::-1]
+        f_signal = f_signal[start_index:]
+        sig_len = len(f_signal)
+        for indx in range(0, sig_len, step):
+            segment_sig = f_signal[indx:indx + seg_length]
+            segment_len = len(segment_sig)
+            padding(segment_sig, seg_length)
+            event.append(segment_sig)
+            event_len.append(segment_len)
+
+        #evaluation = DataSet(event=event, event_length=event_len, label=label, label_length=label_len, for_eval=True)
+        ## take care about the label_vec, label_segs
+        evaluation = DataSet(event=event, event_length=event_len, label=label, label_length=label_len, label_vec = list(), label_segs= list(), for_eval=True)
+
+    return evaluation
 def read_data_for_eval(file_path, 
                        start_index=0,
                        step=20, 
@@ -468,6 +507,26 @@ def read_raw_data_sets(data_dir, h5py_file_path=None, seq_length=300, k_mer=1, m
 
     return train
 
+def read_signal2(file_path, normalize="median"):
+    
+    f_h = open(file_path, 'r')
+    signal = list()
+    
+    for line in f_h:
+        signal += [float(x) for x in line.split()]
+    signal = np.asarray(signal)
+    print("signal length : %d"%len(signal))
+    return signal.tolist()
+    if len(signal) == 0:
+        return signal.tolist()
+    
+    if normalize == "mean":
+        signal = (signal - np.mean(signal)) / np.float(np.std(signal))
+    
+    elif normalize == "median":
+        signal = (signal - np.median(signal)) / np.float(robust.mad(signal))
+    
+    return signal.tolist()
 #data normalization applied here
 def read_signal(file_path, normalize="median"):
     
