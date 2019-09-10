@@ -66,7 +66,7 @@ python fast5_test_urnet.py -i $SIGNAL_FOLD -it signal -o $OUTPUT -mp $MODEL -los
 
 ### Results
 
-We have compared the basecalling performance of URnano with other basecallers, i.e. [Chiron]((https://github.com/haotianteng/Chiron)) and [Guppy](https://github.com/nanoporetech/taiyaki).
+We have compared the basecalling performance of URnano with other basecallers, i.e. [Chiron](https://github.com/haotianteng/Chiron) and [Guppy](https://github.com/nanoporetech/taiyaki).
 In order to have a fair comparison we trained and tested all models on the same datasets. Below are the raw accuracy results for each basecaller:
 
 ![raw Accuracy](raw_accuracy.png)
