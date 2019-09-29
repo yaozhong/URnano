@@ -321,7 +321,7 @@ def evaluation2(signal_input, args):
             
             if args.norm != "":
                 X = (X - stat_dict["m"])/(stat_dict["s"])
-            raw_preds = unet_basecaller(unet_model,X)
+            raw_preds = unet_basecaller2(unet_model,X)
             #reads += output
             #output2 = unet_basecaller2(unet_model,X,jump = args.jump)
             if len(raw_reads)==0:
@@ -429,32 +429,11 @@ def evaluation(signal_input, args):
                 raw_reads= np.array(raw_preds)
             else:
                 raw_reads=np.concatenate((raw_reads,np.array(raw_preds)))
-        #print("Number of consecutive segments for this file : %d "%len(raw_reads))
-        #print("Shape  of a single raw_read")
-        #print(raw_reads.shape)
-        #print(len(raw_reads[0]))
-        #print(len(raw_reads[0][0]))
-        #print("Length of the reads: %d " %len(reads)) 
         print("Segment reads base calling finished, begin to assembly. %5.2f seconds" % (time.time() - start_time))
         basecall_time = time.time() - start_time
         final_read = concatenate_reads(raw_reads,jump = args.jump)
-        #print("Final read with ardas method : ")
-        #print("Length: %d "%len(final_read))
-        #print(final_read)
-        # assembly the read results
-
-        # doing simple assembly methods
-        #print("old way of reads ")
-        #print(reads[0])
-        #consensus = simple_assembly(reads)
-        #consensus  = simple_assembly(reads, args.jump/args.segment_len, error_rate = 0.2,kernal = 'glue')
-        #c_bpread = index2base_0(np.argmax(consensus, axis=0))
-
-        #print("Final read by simple assembly length : %d" %len(c_bpread))
-        #print("Final read by arda assembly length : %d "%len(final_read))
         assembly_time = time.time() - start_time
         print("Assembly finished, begin output. %5.2f seconds" % (time.time() - start_time))
-
         # writing the files to the fold
         list_of_time = [start_time, reading_time, basecall_time, assembly_time]
         #write_output2(args, reads, "".join(c_bpread),"".join([x for x in final_read]), list_of_time, file_pre)
