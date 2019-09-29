@@ -83,7 +83,7 @@ After installing the external tools you can do assemblies using the following li
 
 
 
-'''
+```
 RACON=/home/aakdemir/racon/build/bin/racon
 raw_read=${1}
 out_folder=${2}
@@ -117,7 +117,7 @@ do
 
 done
 
-'''
+```
 
 
 ## Acknowledgement
