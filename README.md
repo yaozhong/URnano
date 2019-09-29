@@ -89,15 +89,12 @@ Below is the line of commands used for calculating the assemblies. The script is
 ### get reference and a raw read first align using graphmap
 ref_path=$1
 raw_reads=$2
-#echo $ref_path
-Graphmap=/home/aakdemir/graphmap/bin/Linux-x64/graphmap
+Graphmap=/path/to/graphmap
 Japsa=.usr/local/bin/jsa.hts.errorAnalysis
 name="${raw_reads%%.fastq}"
 filenameind=$(echo $name | grep -b -o "/" | tail -1)
-#echo $filenameind
 ind=${filenameind%%:*}
 filename=${name:(ind+1)}
-#echo $filename
 outfile=${filename}_errorAnalysis.txt
 echo "Outputting to: "${filename}.sam
 ${Graphmap} align -r ${ref_path} -d ${raw_reads} -o $filename.sam
@@ -122,11 +119,10 @@ After installing the external tools you can do assemblies using the following li
 
 
 ```
-RACON=/home/aakdemir/racon/build/bin/racon
+RACON=/path/to/racon
 raw_read=${1}
 out_folder=${2}
 if [ ! -d "${out_folder}" ]; then
-    echo "ARDA"
     mkdir ${out_folder}
     mkdir ${out_folder}"/racon_assembly"
     mkdir ${out_folder}"/racon_assembly/consensus"
