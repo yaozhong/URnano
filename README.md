@@ -71,6 +71,55 @@ In order to have a fair comparison we trained and tested all models on the same 
 
 ![raw Accuracy](raw_accuracy.png)
 
+### Assembly Results 
+
+In order to compare URNano fairly with other basecallers we used the same pipeline used for evaluating [Chiron](https://github.com/haotianteng/Chiron). Below is the line of commands need to be run in order to create assemblies with 10 rounds of polishing. We used the following external tools with their versions :
+
+- Minimap2 : 2.17-r943-dirty
+- Miniasm : 0.3-r179
+- Racon : v1.4.6
+
+After installing the external tools you can do assemblies using the following lines of commands : 
+
+
+
+'''
+RACON=/home/aakdemir/racon/build/bin/racon
+raw_read=${1}
+out_folder=${2}
+if [ ! -d "${out_folder}" ]; then
+    echo "ARDA"
+    mkdir ${out_folder}
+    mkdir ${out_folder}"/racon_assembly"
+    mkdir ${out_folder}"/racon_assembly/consensus"
+fi
+
+out_file="${out_folder}/racon_assembly/consensus/"
+echo $out_file
+if [ ! -f "${out_file}merge_1_par.fastq" ]; then
+    cp ${raw_read} ${out_file}"merge_1_par.fastq"
+fi
+
+minimap2/minimap2 -x ava-ont -k12 -w5  ${out_file}merge_${i}_par.fastq ${out_file}merge_${i}_par.fastq > ${out_file}reads_${i}.paf
+miniasm/miniasm   -f   ${out_file}merge_${i}_par.fastq ${out_file}reads_${i}.paf > ${out_file}raw_contigs_${i}.gfa
+awk '$1 ~/S/ {print ">"$2"\n"$3}' ${out_file}raw_contigs_${i}.gfa > ${out_file}raw_contigs_${i}.fasta
+echo "Running minimap with raw_contigs and merge_1_par.fastq"
+minimap2/minimap2   ${out_file}raw_contigs_${i}.fasta ${out_file}merge_${i}_par.fastq > ${out_file}mapping_${i}.paf
+echo "Racon mapping"
+${RACON}   ${out_file}merge_${i}_par.fastq ${out_file}mapping_${i}.paf ${out_file}raw_contigs_${i}.fasta > ${out_file}consensus_${i}_0.fasta
+
+
+## 10 rounds of  polishing
+for j in 0 1 2 3 4 5 6 7 8 9 10
+do
+    minimap2/minimap2  ${out_file}consensus_${i}_${j}.fasta ${out_file}merge_${i}_par.fastq > ${out_file}map${i}_${j}.paf
+    ${RACON}   ${out_file}merge_${i}_par.fastq ${out_file}map${i}_${j}.paf  ${out_file}consensus_${i}_${j}.fasta >  ${out_file}consensus_${i}_$((j+1)).fasta
+
+done
+
+'''
+
+
 ## Acknowledgement
 We thank Chiron authors for providing [source code](https://github.com/haotianteng/Chiron) and [dataset](http://gigadb.org/dataset/100425).
 The signal reading part and merging of base-calling results for a whole read part are revised based on Chiron (V0.3)'s code following MPL 2.0.
