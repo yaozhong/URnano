@@ -67,11 +67,49 @@ python fast5_test_urnet.py -i $SIGNAL_FOLD -it signal -o $OUTPUT -mp $MODEL -los
 ### Results
 
 We have compared the basecalling performance of URnano with other basecallers, i.e. [Chiron](https://github.com/haotianteng/Chiron) and [Guppy](https://github.com/nanoporetech/taiyaki).
-In order to have a fair comparison we trained and tested all models on the same datasets. Below are the raw accuracy results for each basecaller:
+In order to have a fair comparison we trained and tested all models on the same datasets. 
+
+
+#### Accuracy Results
+
+Below are the raw accuracy results for each basecaller:
 
 ![raw Accuracy](raw_accuracy.png)
 
-### Assembly Results 
+In order to calculate the accuracies we used the following tools :
+
+- Graphmap : Version: v0.5.2
+- Japsa : 1.9-3c
+
+Below is the line of commands used for calculating the assemblies. The script is available in accuracy.sh:
+
+```
+
+#!/bin/bash
+### get reference and a raw read first align using graphmap
+ref_path=$1
+raw_reads=$2
+#echo $ref_path
+Graphmap=/home/aakdemir/graphmap/bin/Linux-x64/graphmap
+Japsa=.usr/local/bin/jsa.hts.errorAnalysis
+name="${raw_reads%%.fastq}"
+filenameind=$(echo $name | grep -b -o "/" | tail -1)
+#echo $filenameind
+ind=${filenameind%%:*}
+filename=${name:(ind+1)}
+#echo $filename
+outfile=${filename}_errorAnalysis.txt
+echo "Outputting to: "${filename}.sam
+${Graphmap} align -r ${ref_path} -d ${raw_reads} -o $filename.sam
+echo "Aligned ${raw_reads} to ${ref_path}"
+${Japsa} --bamFile=${filename}.sam --reference=${ref_path} > ${outfile}
+cat ${outfile}
+echo "Results stored in: "${outfile}
+```
+
+
+
+#### Assembly Results 
 
 In order to compare URNano fairly with other basecallers we used the same pipeline used for evaluating [Chiron](https://github.com/haotianteng/Chiron). Below is the line of commands need to be run in order to create assemblies with 10 rounds of polishing. We used the following external tools with their versions :
 
@@ -79,7 +117,7 @@ In order to compare URNano fairly with other basecallers we used the same pipeli
 - Miniasm : 0.3-r179
 - Racon : v1.4.6
 
-After installing the external tools you can do assemblies using the following lines of commands : 
+After installing the external tools you can do assemblies using the following lines of commands (merge_1_par.fastq is the initial basecalls). The script is available named assembly_script.sh: 
 
 
 
@@ -118,6 +156,7 @@ do
 done
 
 ```
+
 
 
 ## Acknowledgement
