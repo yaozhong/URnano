@@ -1,5 +1,13 @@
 # URnano: Nanopore base-calling from a perspective of instance segmentation
 
+
+***NOTE:***
+
+The branch in this code uses the soft_merging method during the assembly of overlapping segments.
+We observed a slight performance increase in read accuracy results after switching to this results.
+The master branch provides two additional assembly methods (easy_assembly and glue assembly).
+
+
 URnano is a nanopore base-caller that performing base-calling as a multi-label segmenation task.
 More details can be found in [BioAxiv](https://www.biorxiv.org/content/10.1101/694919v1).
 
@@ -52,7 +60,10 @@ python test_urnet.py -tm plt -cf $TESTDATA -i $TEST_IN -mp $MODEL -l $LOSS -nID 
 ```
 
 
-### (2). whole read base-calling from fast5
+### (2). whole read base-calling from fast5 (with soft_merging method)
+
+-j determines the jump between consecutive overlapping segments.
+
 ```
 spiece="ecoli"
 SIGNAL_FOLD="../data/chiron_data/paper_eval/unet_result/signals/ecoli/"
@@ -61,7 +72,7 @@ MODEL="../experiment/model/Unet.model.parameters.json"
 LOSS="ce_dice_loss"
 NORM_FILE_SAVE="../experiment/model/statistics/all_data_stats.pickle"
 
-python fast5_test_urnet.py -i $SIGNAL_FOLD -it signal -o $OUTPUT -mp $MODEL -loss $LOSS -nID 3 -norm $NORM_FILE_SAVE -tag URnet.all
+python fast5_test_urnet.py -i $SIGNAL_FOLD -it signal -o $OUTPUT -mp $MODEL -loss $LOSS -nID 3 -norm $NORM_FILE_SAVE -tag URnet.all -j 290
 ```
 
 ### Results
@@ -74,7 +85,7 @@ In order to have a fair comparison we trained and tested all models on the same 
 
 Below are the raw accuracy results for each basecaller:
 
-![raw Accuracy](raw_accuracy.png)
+![raw Accuracy](images/dwraw_accuracy.png)
 
 In order to calculate the accuracies we used the following tools :
 
