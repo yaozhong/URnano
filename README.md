@@ -85,7 +85,7 @@ In order to have a fair comparison we trained and tested all models on the same 
 
 Below are the raw accuracy results for each basecaller:
 
-![raw Accuracy](images/dwraw_accuracy.png)
+![raw Accuracy](images/raw_accuracy.png)
 
 In order to calculate the accuracies we used the following tools :
 
