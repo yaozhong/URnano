@@ -37,7 +37,7 @@ python train_urnet.py -cf $TRAINDATA -i $TRAIN_IN -mp $MODEL -l $LOSS -nID 3 -fS
 
 
 ## Testing
-### (1). Non-overlapping evluation
+### (1). Non-overlapping evaluation
 ```
 ## Network structure
 MODEL="../experiment/model/URnet.model.parameters.json"
