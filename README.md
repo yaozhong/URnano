@@ -1,6 +1,6 @@
 # URnano: Nanopore base-calling from a perspective of instance segmentation
 
-[Notification]: We are now updating package version (tensorflow2) and adding several new features (e.g. data I/O, Bonito train data benchmarking, indpendent module of segmentation, etc.).
+[Notification]: We are now updating latest package version and adding several new features (e.g. data I/O, Bonito train data benchmarking, indpendent module of segmentation, etc.).
 The next version release is scheduled on 2021/11/30.
 
 URnano is a nanopore base-caller that performing base-calling as a multi-label segmenation task.
