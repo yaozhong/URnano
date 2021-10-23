@@ -1,7 +1,10 @@
 # URnano: Nanopore base-calling from a perspective of instance segmentation
 
+[Notification]: We are now updating package versions and developing several new features (e.g. tensorflow2, data I/O, Bonito train data benchmarking, etc.).
+The next version release is scheduled on 2021/11/30.
+
 URnano is a nanopore base-caller that performing base-calling as a multi-label segmenation task.
-More details can be found in [BioAxiv](https://www.biorxiv.org/content/10.1101/694919v1).
+More details can be found in [BMC Bioinformatics](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-3459-0).
 
 ## Docker enviroment
 We provide a docker image for running this code
